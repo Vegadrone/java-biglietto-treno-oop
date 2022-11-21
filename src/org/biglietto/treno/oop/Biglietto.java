@@ -1,6 +1,7 @@
 package org.biglietto.treno.oop;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 public class Biglietto {
 	
@@ -9,23 +10,34 @@ public class Biglietto {
 	private int etaPasseggero;
 	private int kmPasseggero;
 	
+	private boolean flessibile;
+	private LocalDate data;
+	
+	
 	//------------------------------------------------------------------------
 	
 	//Aggiungo le costanti
 	
-	private static final BigDecimal PREZZO_KM = new BigDecimal(0.21); 
+	private static final BigDecimal PREZZO_KM = new BigDecimal(.21); 
 
-	private static final BigDecimal OVER65_SCONTO = new BigDecimal(0.40);
+	private static final BigDecimal OVER65_SCONTO = new BigDecimal(.40);
 	
-	private static final BigDecimal UNDER18_SCONTO = new BigDecimal (0.20);
+	private static final BigDecimal UNDER18_SCONTO = new BigDecimal (.20);
+	
+	private static final BigDecimal PREZZO_FLESSIBILE = new BigDecimal(.10);
+	
+	private static final int NORMALE = 30;
+	private static final int FLESSIBILE = 90;
 	
 	//--------------------------------------------------------------------------
 	
 	//Costruttore
 	
-	public Biglietto(int etàPasseggero, int kmPasseggero) throws Exception{
+	public Biglietto(int etàPasseggero, int kmPasseggero, boolean flessibile) throws Exception{
 		isValidEta(etàPasseggero);
 		isValidKm(kmPasseggero);
+		this.flessibile = flessibile;
+		this.data = LocalDate.now();
 	}
 	
 	//-------------------------------------------------------------------------
@@ -79,15 +91,27 @@ public class Biglietto {
 	}
 	
 	public BigDecimal calcolaPrezzoBiglietto() {
+		if(flessibile) {
+    		return calcolaSconti().multiply(BigDecimal.valueOf(kmPasseggero).multiply(PREZZO_FLESSIBILE));
+    	}
 		return calcolaSconti().multiply(BigDecimal.valueOf(kmPasseggero));
 	}
+	
+	public LocalDate calcolaScadenza() {
+		if (flessibile) {
+    		return data.plusDays(FLESSIBILE);
+    	} 
+    	return data.plusDays(NORMALE);
+    }
 	
 	
 	@Override
 	public String toString() {
 		return "Km: " + getKmPasseggero()
 		+ "\nEtà: " + getEtaPasseggero()
-		+ "\nPrezzo: " + calcolaPrezzoBiglietto();
+		+ "\nPrezzo: " + calcolaPrezzoBiglietto()
+		+ "\nFlessibile: " + (flessibile ? "sì" : "no")
+		+ "\nData di scadenza: " + calcolaScadenza();
 	}
 	
 }
